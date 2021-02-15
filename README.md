@@ -4,7 +4,7 @@
 - Clone the repository  
 `git clone https://github.com/Mike-mg/books_toscrape.git`
 ####
-- Go to the books_toscrape folder  
+- Go to the books_toscrape folder
 ####
 - Creating a working environment  
 `python -m venv env`
@@ -20,3 +20,7 @@
 ####
 - To disable the working environment  
 `deactivate`
+`./Books_to_Scrape.py`  
+####
+- To disable the working environment    
+`deactivate`  
