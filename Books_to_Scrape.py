@@ -203,7 +203,9 @@ def main():
 
     while True:
 
-        print('\n==============================================================')
+        print(f'\n==============================================================\n\
+        \rCategory of website : {address_site}\n\
+        \r==============================================================\n')
 
         for k, v in enumerate(title_category()):
             print(f" N°{k} : {v}")
@@ -217,13 +219,12 @@ def main():
 
         print('\n--------------------------------------------')
         choice = input('Select a category or option of [ 0 to 52 ] : ')
-        print('--------------------------------------------')
+        print('--------------------------------------------\n')
 
         try:
             choice = int(choice)
 
         except (TypeError, ValueError, NameError):
-            os.system('clear')
             continue
 
         if choice >= 0 and choice <= 49:
