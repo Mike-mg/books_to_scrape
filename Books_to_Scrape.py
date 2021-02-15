@@ -149,13 +149,21 @@ def create_folders_and_pics_by_category(category):
             print(f'Downloading of Images and creation of the category folder : {link_category}')
             print('-----------------------------------------------------------\n')
 
+            if os.path.exists(f'{dossier}'):
+                pass
+                print(f'> The folder exist : {dossier}')
+
+            else:
+                os.mkdir(f"{dossier}")
+                print(f'> The folder has been created : {dossier}')
+
             if os.path.exists(f'{dossier}{link_category}'):
                 pass
-                print(f'> The folder exist : {dossier}{link_category}\n')
+                print(f'> The folder exist : {dossier}{link_category}\n\n')
 
             else:
                 os.mkdir(f"{dossier}{link_category}")
-                print(f'> The folder has been created : {dossier}{link_category}')
+                print(f'> The folder has been created : {dossier}{link_category}\n\n')
 
             for y in nb_page_by_category([x]):
 
@@ -208,17 +216,17 @@ def main():
         \r==============================================================\n')
 
         for k, v in enumerate(title_category()):
-            print(f" N°{k} : {v}")
+            print(f"N°{k} : {v}")
 
-        print('\n+ Others options -----------------------------------------------')
-        print(f" N°{k + 1} : All categories by book (separate image folders)")
-        print(f" N°{k + 2} : All categories in one file (separate image folders)")
-        print(f" N°{k + 3} : Quit the program")
-        print('================================================================')
+        print(f'\n+++ Others options ---------------------------------------------\n\
+        \rN°{k + 1} : All categories by book (separate image folders)\n\
+        \rN°{k + 2} : All categories in one file (separate image folders)\n\
+        \rN°{k + 3} : Quit the program\n\
+        \r================================================================')
 
 
         print('\n--------------------------------------------')
-        choice = input('Select a category or option of [ 0 to 52 ] : ')
+        choice = input(' Select a category or option of [ 0 to 52 ] : ')
         print('--------------------------------------------\n')
 
         try:
