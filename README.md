@@ -1,4 +1,5 @@
 # Books_to_Scrape.py
+###
 #### Books_to_Scrape.py is a script that allows you to retrieve book information from each category of the https://books.toscrape.com/ website.
 ## Installation & launch
 - Clone the repository  
@@ -20,7 +21,3 @@
 ####
 - To disable the working environment  
 `deactivate`
-`./Books_to_Scrape.py`  
-####
-- To disable the working environment    
-`deactivate`  
