@@ -203,26 +203,26 @@ def main():
 
     while True:
 
+        print('\n==============================================================')
+
         for k, v in enumerate(title_category()):
             print(f" N°{k} : {v}")
 
-        print('\n+ Others options --------------------------------------------')
+        print('\n+ Others options -----------------------------------------------')
         print(f" N°{k + 1} : All categories by book (separate image folders)")
         print(f" N°{k + 2} : All categories in one file (separate image folders)")
-        print('------------------------------------------------------------')
+        print(f" N°{k + 3} : Quit the program")
+        print('================================================================')
+
 
         print('\n--------------------------------------------')
-        choice = input('Select a category or option of [ 0 to 51 ] : ')
+        choice = input('Select a category or option of [ 0 to 52 ] : ')
         print('--------------------------------------------')
 
         try:
             choice = int(choice)
 
-        except TypeError:
-            os.system('clear')
-            continue
-
-        except ValueError:
+        except (TypeError, ValueError, NameError):
             os.system('clear')
             continue
 
@@ -247,6 +247,9 @@ def main():
             infos_books = book_info(all_pages)
             backup_data(infos_books, 'all categories')
             create_folders_and_pics_by_category(category)
+
+        elif choice == 52:
+            return False
 
         else:
             continue
