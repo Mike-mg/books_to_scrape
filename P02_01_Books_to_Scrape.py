@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 
 import requests
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup as Bs
 
 # ===============================================
 
@@ -27,15 +27,15 @@ def title_category():
     Search all category titles
     """
 
-    title_category = []
+    titles = []
 
     r_url = requests.get(ADDRESS_SITE)
-    bs_page = bs(r_url.content, "html.parser")
+    bs_page = Bs(r_url.content, "html.parser")
 
     for list_link in bs_page.find("ul", class_="nav-list")("ul")[0]("li"):
-        title_category.append(list_link.find("a").text.strip())
+        titles.append(list_link.find("a").text.strip())
 
-    return title_category
+    return titles
 
 
 # ===============================================
@@ -48,7 +48,7 @@ def category_link():
 
     links = []
     r_url = requests.get(ADDRESS_SITE)
-    bs_page = bs(r_url.content, "html.parser")
+    bs_page = Bs(r_url.content, "html.parser")
 
     for list_link in bs_page.find_all("ul", class_="nav-list")[0]("ul")[0]("li"):
         links.append(urllib.parse.urljoin(ADDRESS_SITE, list_link("a")[0]["href"]))
@@ -59,29 +59,31 @@ def category_link():
 # ===============================================
 
 
-def nb_page_by_category(category_link):
+def nb_page_by_category(category):
     """
     search the number of pages by category
     """
 
     list_by_page = []
 
-    for page_by_book in category_link:
+    for page_by_book in category:
 
         list_by_page.append(page_by_book)
 
         url_page = page_by_book.rpartition("index.html")[0]
 
         page = requests.get(page_by_book)
-        bs_page = bs(page.content, "html.parser")
+        bs_page = Bs(page.content, "html.parser")
 
         while bs_page.find("li", class_="next"):
 
-            url_next_page = urllib.parse.urljoin(url_page, bs_page.find_all("li", class_="next")[0]("a")[0]["href"])
+            url_next_page = urllib.parse.urljoin(
+                url_page, bs_page.find_all("li", class_="next")[0]("a")[0]["href"]
+            )
             list_by_page.append(url_next_page)
 
             n_page_next = requests.get(url_next_page)
-            bs_page = bs(n_page_next.content, "html.parser")
+            bs_page = Bs(n_page_next.content, "html.parser")
 
     return list_by_page
 
@@ -98,7 +100,7 @@ def book_info(nb_page_category):
     for urls_page in nb_page_category:
 
         page = requests.get(urls_page)
-        art = bs(page.content, "html.parser")
+        art = Bs(page.content, "html.parser")
 
         for url_article in art.find_all("div", class_="image_container"):
 
@@ -108,37 +110,65 @@ def book_info(nb_page_category):
             product_page_url = urllib.parse.urljoin(ADDRESS_SITE, url_split)
 
             info = requests.get(product_page_url)
-            book = bs(info.content, "html.parser")
+            book = Bs(info.content, "html.parser")
 
             # product_page_url
             info_article.append(product_page_url)
 
             # universal_ product_code (upc)
-            info_article.append(book.find("table", class_="table table-striped")("tr")[0]("td")[0].text.strip())
+            info_article.append(
+                book.find("table", class_="table table-striped")("tr")[0]("td")[
+                    0
+                ].text.strip()
+            )
 
             # title
-            info_article.append(book.find("div", class_="col-sm-6 product_main")('h1')[0].text.strip())
+            info_article.append(
+                book.find("div", class_="col-sm-6 product_main")("h1")[0].text.strip()
+            )
 
             # price_including_tax
-            info_article.append(book.find("table", class_="table-striped")("tr")[3]("td")[0].text.strip())
+            info_article.append(
+                book.find("table", class_="table-striped")("tr")[3]("td")[
+                    0
+                ].text.strip()
+            )
 
             # price_excluding_tax
-            info_article.append(book.find("table", class_="table-striped")("tr")[2]("td")[0].text.strip())
+            info_article.append(
+                book.find("table", class_="table-striped")("tr")[2]("td")[
+                    0
+                ].text.strip()
+            )
 
             # number_available
-            info_article.append(book.find("p", class_="instock availability").text.strip())
+            info_article.append(
+                book.find("p", class_="instock availability").text.strip()
+            )
 
             # product_description
-            info_article.append(book.find("div", class_="sub-header")("h2")[0].find_next("p").text.strip())
+            info_article.append(
+                book.find("div", class_="sub-header")("h2")[0]
+                .find_next("p")
+                .text.strip()
+            )
 
             # category
-            info_article.append(book.find("ul", class_="breadcrumb")("li")[2].text.strip())
+            info_article.append(
+                book.find("ul", class_="breadcrumb")("li")[2].text.strip()
+            )
 
             # review_rating
-            info_article.append(book.find("p", class_="star-rating")["class"][1].strip())
+            info_article.append(
+                book.find("p", class_="star-rating")["class"][1].strip()
+            )
 
             # image_url
-            img_name_path = book.find("div", class_="item active")("img")[0]["src"].rpartition("../")[2].strip()
+            img_name_path = (
+                book.find("div", class_="item active")("img")[0]["src"]
+                .rpartition("../")[2]
+                .strip()
+            )
             info_article.append(urllib.parse.urljoin(ADDRESS_SITE, img_name_path))
 
             infos_articles.append(info_article)
@@ -159,13 +189,17 @@ def create_folders_and_pics_by_category(category):
     for url_category in category:
 
         page = requests.get(url_category)
-        page_article = bs(page.content, "html.parser")
+        page_article = Bs(page.content, "html.parser")
 
-        link_category = page_article.find("div", class_="page-header action")("h1")[0].text.strip()
+        link_category = page_article.find("div", class_="page-header action")("h1")[
+            0
+        ].text.strip()
 
-        print(f"\n\n\n\n-----------------------------------------------------------\n\
+        print(
+            f"\n\n\n\n-----------------------------------------------------------\n\
                 \rDownloading of Images and creation of the category folder : {link_category}\n\
-                \r-----------------------------------------------------------\n")
+                \r-----------------------------------------------------------\n"
+        )
 
         path_image = f"{IMAGES_FOLDER}{link_category}"
         os.makedirs(path_image, exist_ok=True)
@@ -173,13 +207,15 @@ def create_folders_and_pics_by_category(category):
         for all_page_by_category in nb_page_by_category([url_category]):
 
             page = requests.get(all_page_by_category)
-            bs_page = bs(page.content, "html.parser")
+            bs_page = Bs(page.content, "html.parser")
 
             for url_image in bs_page.find_all("div", class_="image_container"):
 
-                img_name = url_image('a')[0]('img')[0]['src'].rpartition('/')[2]
-                img_name_path = url_image('a')[0]('img')[0]['src'].rpartition('../')[2]
-                img_name_full_path = urllib.parse.urljoin(ADDRESS_SITE, f"{img_name_path}")
+                img_name = url_image("a")[0]("img")[0]["src"].rpartition("/")[2]
+                img_name_path = url_image("a")[0]("img")[0]["src"].rpartition("../")[2]
+                img_name_full_path = urllib.parse.urljoin(
+                    ADDRESS_SITE, f"{img_name_path}"
+                )
 
                 print(f"> Url image : {img_name_full_path}")
                 print(f"> Destination : {IMAGES_FOLDER}{link_category}")
@@ -188,8 +224,12 @@ def create_folders_and_pics_by_category(category):
                     print(f"> Url image : Already downloaded\n")
 
                 else:
-                    urllib.request.urlretrieve(img_name_full_path, f"{IMAGES_FOLDER}{link_category}/{img_name}")
-                    print(f"> Image for downloading : {url_image('a')[0]('img')[0]['src'].rpartition('/')[2]}\n")
+                    urllib.request.urlretrieve(
+                        img_name_full_path, f"{IMAGES_FOLDER}{link_category}/{img_name}"
+                    )
+                    print(
+                        f"> Image for downloading : {url_image('a')[0]('img')[0]['src'].rpartition('/')[2]}\n"
+                    )
 
 
 # ===============================================
@@ -202,10 +242,13 @@ def backup_data(info_book, filename):
 
     os.makedirs(DATAS_FOLDER, exist_ok=True)
 
-    with open(f"{DATAS_FOLDER}{filename}.csv", "w", newline="\n", encoding='utf-8-sig') as f:
+    with open(
+        f"{DATAS_FOLDER}{filename}.csv", "w", newline="\n", encoding="utf-8-sig"
+    ) as f:
 
         file_csv = csv.writer(f)
-        file_csv.writerow([
+        file_csv.writerow(
+            [
                 "Product_page_url",
                 "Upc",
                 "Titre",
@@ -216,12 +259,14 @@ def backup_data(info_book, filename):
                 "Category",
                 "Review_rating",
                 "Image_url",
-                        ])
+            ]
+        )
 
-        for ligne in info_book:
-            file_csv.writerow(ligne)
+        file_csv.writerows(info_book)
 
-    print(f'>>> Downloads of data and images for the category < "{filename}" > are complete\n')
+    print(
+        f'>>> Downloads of data and images for the category < "{filename}" > are complete\n'
+    )
 
 
 # ===============================================
@@ -229,20 +274,27 @@ def backup_data(info_book, filename):
 
 def main():
 
+    category = category_link()
+    title = title_category()
+
     while True:
 
-        print(f"\n==============================================================\n\
+        print(
+            f"\n==============================================================\n\
                  \rCategory of website : {ADDRESS_SITE}\n\
-                 \r==============================================================\n")
+                 \r==============================================================\n"
+        )
 
         for k, v in enumerate(title_category()):
             print(f"N°{k} : {v}")
 
-        print(f"\n+++ Others options ---------------------------------------------\n\
+        print(
+            f"\n+++ Others options ---------------------------------------------\n\
                 \rN°50 : All categories by book (separate image folders)\n\
                 \rN°51 : All categories in one file (separate image folders)\n\
                 \rN°52 : Quit the program\n\
-                \r================================================================")
+                \r================================================================"
+        )
 
         print("\n---------------------------------------------")
         choice = input(" Select a category or option of [ 0 to 52 ] : ")
@@ -252,36 +304,53 @@ def main():
             choice = int(choice)
 
         except (TypeError, ValueError, NameError):
-            print("\n\n******************************************************\n\
+            print(
+                "\n\n******************************************************\n\
                   \r|   Input error, specify a number between 0 and 52   |\n\
-                  \r******************************************************\n")
+                  \r******************************************************\n"
+            )
             time.sleep(5)
             continue
 
-        if choice >= 0 and choice <= 49:
-            all_pages = nb_page_by_category([category_link()[choice]])
+        if 0 <= choice <= 49:
+            """
+            > Choose < 0 - 49 > to retrieve the information from a particular book in a separate file
+            > The image folder will be downloaded separately
+            """
+            all_pages = nb_page_by_category([category[choice]])
             infos_books = book_info(all_pages)
-            create_folders_and_pics_by_category([category_link()[choice]])
-            backup_data(infos_books, title_category()[choice])
+            create_folders_and_pics_by_category([category[choice]])
+            backup_data(infos_books, title[choice])
 
         elif choice == 50:
-            for i, category in enumerate(category_link()):
-                all_pages = nb_page_by_category([category_link()[i]])
+            """
+            > Choose <50> to retrieve all the information in a different file book by book
+            > The images will be uploaded in a separate folder.
+            > The treatment is done in one go for all categories
+            """
+            for i, link_category in enumerate(category):
+                all_pages = nb_page_by_category([link_category])
                 infos_books = book_info(all_pages)
-                create_folders_and_pics_by_category([category_link()[i]])
-                backup_data(infos_books, title_category()[i])
+                create_folders_and_pics_by_category([link_category])
+                backup_data(infos_books, title[i])
 
         elif choice == 51:
-            all_pages = nb_page_by_category(category_link())
+            """ 
+            > Choose <51> to retrieve all the information from the books in a single file
+            > The images will be uploaded in a separate folder.
+            > The treatment is done in one go for all categories
+            """
+            all_pages = nb_page_by_category(category)
             infos_books = book_info(all_pages)
-            create_folders_and_pics_by_category(category_link())
+            create_folders_and_pics_by_category(category)
             backup_data(infos_books, "all categories")
 
         elif choice == 52:
+            """
+            > Quit the script
+            """
             break
 
-        else:
-            continue
 
 # ===============================================
 
