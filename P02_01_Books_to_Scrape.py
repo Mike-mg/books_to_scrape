@@ -115,53 +115,41 @@ def book_info(nb_page_category):
             # product_page_url
             info_article.append(product_page_url)
 
-            # universal_ product_code (upc)
-            info_article.append(
-                book.find("table", class_="table table-striped")("tr")[0]("td")[
-                    0
-                ].text.strip()
-            )
+            table_striped = book.find("table", class_="table table-striped")("tr")
+            upc = table_striped[0]("td")[0].text.strip()
+            price_including_tax = table_striped[3]("td")[0].text.strip()
+            price_excluding_tax = table_striped[2]("td")[0].text.strip()
+            info_article.append(upc)
+            info_article.append(price_including_tax)
+            info_article.append(price_excluding_tax)
 
             # title
-            info_article.append(
-                book.find("div", class_="col-sm-6 product_main")("h1")[0].text.strip()
-            )
-
-            # price_including_tax
-            info_article.append(
-                book.find("table", class_="table-striped")("tr")[3]("td")[
-                    0
-                ].text.strip()
-            )
-
-            # price_excluding_tax
-            info_article.append(
-                book.find("table", class_="table-striped")("tr")[2]("td")[
-                    0
-                ].text.strip()
-            )
+            title = book.find("div", class_="col-sm-6 product_main")("h1")[
+                0
+            ].text.strip()
+            info_article.append(title)
 
             # number_available
-            info_article.append(
-                book.find("p", class_="instock availability").text.strip()
-            )
+            number_available = book.find(
+                "p", class_="instock availability"
+            ).text.strip()
+            info_article.append(number_available)
 
             # product_description
-            info_article.append(
+            product_description = (
                 book.find("div", class_="sub-header")("h2")[0]
                 .find_next("p")
                 .text.strip()
             )
+            info_article.append(product_description)
 
             # category
-            info_article.append(
-                book.find("ul", class_="breadcrumb")("li")[2].text.strip()
-            )
+            category = book.find("ul", class_="breadcrumb")("li")[2].text.strip()
+            info_article.append(category)
 
             # review_rating
-            info_article.append(
-                book.find("p", class_="star-rating")["class"][1].strip()
-            )
+            review_rating = book.find("p", class_="star-rating")["class"][1].strip()
+            info_article.append(review_rating)
 
             # image_url
             img_name_path = (
@@ -221,16 +209,15 @@ def create_folders_and_pics_by_category(category):
                 print(f"> Destination : {IMAGES_FOLDER}{link_category}")
 
                 if os.path.isfile(f"{IMAGES_FOLDER}{link_category}/{img_name}"):
-                    print(f"> Url image : Already downloaded\n")
+                    print("> Info image download : Already downloaded\n")
 
                 else:
                     urllib.request.urlretrieve(
                         img_name_full_path, f"{IMAGES_FOLDER}{link_category}/{img_name}"
                     )
                     print(
-                        f"> Image for downloading : {url_image('a')[0]('img')[0]['src'].rpartition('/')[2]}\n"
+                        f"> Info image download : {url_image('a')[0]('img')[0]['src'].rpartition('/')[2]}\n"
                     )
-
 
 # ===============================================
 
@@ -273,6 +260,9 @@ def backup_data(info_book, filename):
 
 
 def main():
+    """
+    Executes the user menu of the script
+    """
 
     category = category_link()
     title = title_category()
@@ -289,7 +279,7 @@ def main():
             print(f"N°{k} : {v}")
 
         print(
-            f"\n+++ Others options ---------------------------------------------\n\
+            "\n+++ Others options ---------------------------------------------\n\
                 \rN°50 : All categories by book (separate image folders)\n\
                 \rN°51 : All categories in one file (separate image folders)\n\
                 \rN°52 : Quit the program\n\
@@ -335,7 +325,7 @@ def main():
                 backup_data(infos_books, title[i])
 
         elif choice == 51:
-            """ 
+            """
             > Choose <51> to retrieve all the information from the books in a single file
             > The images will be uploaded in a separate folder.
             > The treatment is done in one go for all categories
